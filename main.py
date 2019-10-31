@@ -22,6 +22,7 @@ parser.add_argument('--origin_size', default=True, type=str, help='Whether use o
 parser.add_argument('--save_folder', default='./widerface_evaluate/widerface_txt/', type=str, help='Dir to save txt results')
 parser.add_argument('--cpu', action="store_true", default=False, help='Use cpu inference')
 parser.add_argument('--blur',default=True, help="Applies gaussian blur to the face if true")
+parser.add_argument('--kernel_size',default=25, help="kernel size for gaussian blur, more the kernel size, more agressive blur")
 parser.add_argument('--dataset_folder', default='./data/test_images/', type=str, help='dataset path')
 parser.add_argument('--confidence_threshold', default=0.02, type=float, help='confidence_threshold')
 parser.add_argument('--top_k', default=5000, type=int, help='top_k')
@@ -191,6 +192,8 @@ if __name__ == '__main__':
 
         print('im_detect: {:d}/{:d} forward_pass_time: {:.4f}s misc: {:.4f}s'.format(i + 1, num_images, _t['forward_pass'].average_time, _t['misc'].average_time))
 
+
+        args.kernel_size= int(args.kernel_size)
         # save image
         if args.save_image:
             for b in dets:
@@ -198,9 +201,10 @@ if __name__ == '__main__':
                     continue
                 text = "{:.4f}".format(b[4])
                 b = list(map(int, b))
+
                 if args.blur:
                     face_image = img_raw[b[1]:b[3],b[0]:b[2]]
-                    face_image = cv2.GaussianBlur(face_image, (25, 25), 0)
+                    face_image = cv2.GaussianBlur(face_image, (args.kernel_size,args.kernel_size), 0)
                     img_raw[b[1]:b[3],b[0]:b[2]] = face_image
                 else:
 
@@ -217,7 +221,9 @@ if __name__ == '__main__':
                     cv2.circle(img_raw, (b[11], b[12]), 1, (0, 255, 0), 4)
                     cv2.circle(img_raw, (b[13], b[14]), 1, (255, 0, 0), 4)
             # save image
-            if not os.path.exists("./results/"):
-                os.makedirs("./results/")
-            name = "./results/" + str(i) + ".jpg"
+
+            save_dir= "./results_{}/".format(args.kernel_size)
+            if not os.path.exists(save_dir):
+                os.makedirs(save_dir)
+            name = save_dir + str(i) + ".jpg"
             cv2.imwrite(name, img_raw)
