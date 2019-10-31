@@ -1,6 +1,7 @@
-# RetinaFace in PyTorch
+# Face Blur
 
-A [PyTorch](https://pytorch.org/) implementation of Faceblur modified from Retinaface code by [biubug6/Pytorch_Retinaface](https://github.com/biubug6/Pytorch_Retinaface) which is originally developed on [RetinaFace: Single-stage Dense Face Localisation in the Wild](https://arxiv.org/abs/1905.00641). 
+A [PyTorch](https://pytorch.org/) implementation for blurring the faces on any image to maintain the privacy of the person.
+The code is modified from Retinaface code by [biubug6/Pytorch_Retinaface](https://github.com/biubug6/Pytorch_Retinaface) which is originally developed on [RetinaFace: Single-stage Dense Face Localisation in the Wild](https://arxiv.org/abs/1905.00641). 
 
 ### Contents
 - [Installation](#installation)
