@@ -15,15 +15,15 @@ import glob
 
 
 parser = argparse.ArgumentParser(description='Retinaface')
-parser.add_argument('-m', '--trained_model', default='./weights/Resnet50_Final.pth',
+parser.add_argument('-m', '--trained_model', default='../Resnet50_Final.pth',
                     type=str, help='Trained state_dict file path to open')
 parser.add_argument('--network', default='resnet50', help='Backbone network mobile0.25 or resnet50')
 parser.add_argument('--origin_size', default=True, type=str, help='Whether use origin image size to evaluate')
-parser.add_argument('--save_folder', default='./widerface_evaluate/widerface_txt/', type=str, help='Dir to save txt results')
+parser.add_argument('--save_folder', default='../data_detection/', type=str, help='Dir to save txt results')
 parser.add_argument('--cpu', action="store_true", default=False, help='Use cpu inference')
 parser.add_argument('--blur',default=True, help="Applies gaussian blur to the face if true")
 parser.add_argument('--kernel_size',default=25, help="kernel size for gaussian blur, more the kernel size, more agressive blur")
-parser.add_argument('--dataset_folder', default='./data/test_images/', type=str, help='dataset path')
+parser.add_argument('--dataset_folder', default='../data/test_images.txt', type=str, help='dataset path')
 parser.add_argument('--confidence_threshold', default=0.02, type=float, help='confidence_threshold')
 parser.add_argument('--top_k', default=5000, type=int, help='top_k')
 parser.add_argument('--nms_threshold', default=0.4, type=float, help='nms_threshold')
@@ -88,7 +88,10 @@ if __name__ == '__main__':
     net = net.to(device)
 
     # testing dataset
-    test_dataset = glob.glob(args.dataset_folder+"*")
+    with open(args.dataset_folder, 'r') as f:
+        files = f.readlines()
+        test_dataset = [x.strip() for x in files]
+    #test_dataset = glob.glob(args.dataset_folder+"*")
     num_images = len(test_dataset)
     print(num_images)
 
@@ -175,6 +178,7 @@ if __name__ == '__main__':
         dirname = os.path.dirname(save_name)
         if not os.path.isdir(dirname):
             os.makedirs(dirname)
+        print(save_name)
         with open(save_name, "w") as fd:
             bboxs = dets
             file_name = os.path.basename(save_name)[:-4] + "\n"
@@ -195,6 +199,7 @@ if __name__ == '__main__':
 
         args.kernel_size= int(args.kernel_size)
         # save image
+        args.save_image = False
         if args.save_image:
             for b in dets:
                 if b[4] < args.vis_thres:
@@ -222,8 +227,9 @@ if __name__ == '__main__':
                     cv2.circle(img_raw, (b[13], b[14]), 1, (255, 0, 0), 4)
             # save image
 
-            save_dir= "./results_{}/".format(args.kernel_size)
+            save_dir= "../results_{}/".format(args.kernel_size)
             if not os.path.exists(save_dir):
                 os.makedirs(save_dir)
             name = save_dir + str(i) + ".jpg"
+            print(img_name, name)
             cv2.imwrite(name, img_raw)
